@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Input Alert Example</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .container {
+            margin-bottom: 10px;
+        }
+        button {
+            margin-left: 5px;
+        }
+        #output {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .item {
+            background-color: white;
+            border: 2px solid black;
+            padding: 5px;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 50px;
+            width: 50px;
+            cursor: pointer; /* Show pointer cursor on hover */
+        }
+        .inserted {
+            background-color: green;
+        }
+        .deleted {
+            background-color: red;
+        }
+        .printed {
+            background-color: lightgray;
+        }
+        .highlighted {
+            background-color: yellow; /* Highlighted color for found items */
+        }
+        .message {
+            color: red; /* Message color */
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <label for="inputValue">Enter Array Item:</label>
+        <input type="text" id="inputValue">
+        <button onclick="Insert()">Insert</button>
+        <button onclick="Delete()">Delete</button>
+        <button onclick="Find()">Find</button>
+        <button onclick="Print()">Print</button><br>
+        <label id="emptyMessage" style="display: none;">Array is empty</label>
+        <div id="message" class="message"></div> <!-- Message display area -->
+    </div>
+
+    <div id="output"></div>
+
+    <script>
+        const array = [];
+
+        function updateEmptyMessage() {
+            const emptyMessage = document.getElementById('emptyMessage');
+            emptyMessage.style.display = array.length === 0 ? 'block' : 'none';
+        }
+
+        function Insert() {
+            const input = document.getElementById('inputValue').value.trim(); // Trim whitespace
+            const messageDiv = document.getElementById('message'); // Get message div
+
+            if (input) {
+                if (array.includes(input)) {
+                    alert(`Item "${input}" already exists in the array.`); // Alert if item exists
+                    return;
+                }
+
+                // Reset all items to default appearance
+                const items = document.querySelectorAll('.item');
+                items.forEach(item => {
+                    item.className = 'item'; // Reset class to default
+                });
+
+                array.push(input);
+                const newElement = document.createElement('div');
+                newElement.textContent = input;
+                newElement.className = 'item inserted';
+                newElement.id = input;
+                document.getElementById('output').appendChild(newElement);
+                document.getElementById('inputValue').value = '';
+                messageDiv.textContent = ''; // Clear message
+                updateEmptyMessage(); // Update empty message visibility
+                
+                // Remove the inserted class after 2 seconds
+                setTimeout(() => {
+                    newElement.className = 'item'; // Reset to default appearance
+                }, 2000); // Change duration to 2000 milliseconds (2 seconds)
+            } else {
+                alert("Please enter a value.");
+            }
+        }
+
+        function Delete() {
+            const input = document.getElementById('inputValue').value.trim(); // Trim whitespace
+            const messageDiv = document.getElementById('message'); // Get message div
+
+            if (input) {
+                const index = array.indexOf(input);
+                if (index > -1) {
+                    messageDiv.textContent = `Deleting item: ${input}`; // Show deletion message
+                    const existingElement = document.getElementById(input);
+                    if (existingElement) {
+                        existingElement.className = 'item deleted'; // Change class to 'deleted'
+                        setTimeout(() => {
+                            existingElement.remove(); // Remove item from the DOM after a short delay
+                            messageDiv.textContent = ''; // Clear the message
+                            updateEmptyMessage(); // Update empty message visibility
+                        }, 500); // Delay to show the red color before removing
+                    }
+                    array.splice(index, 1); // Remove from array
+                    document.getElementById('inputValue').value = '';
+                } else {
+                    alert("Value not found in array.");
+                }
+                updateEmptyMessage(); // Update empty message visibility
+            } else {
+                alert("Please enter a value to delete.");
+            }
+        }
+
+        function Find() {
+            const input = document.getElementById('inputValue').value.trim(); // Trim whitespace
+            if (input) {
+                const index = array.indexOf(input);
+                if (index > -1) {
+                    const existingElement = document.getElementById(input);
+                    if (existingElement) {
+                        existingElement.className = 'item highlighted'; // Change class to 'highlighted'
+                    }
+                    document.getElementById('inputValue').value = '';
+                } else {
+                    alert("Value not found in array.");
+                }
+            } else {
+                alert("Please enter a value to search.");
+            }
+        }
+
+        function Print() {
+            const outputDiv = document.getElementById('output');
+            outputDiv.innerHTML = '';
+            if (array.length === 0) {
+                document.getElementById('emptyMessage').style.display = 'block';
+            } else {
+                array.forEach(item => {
+                    const newElement = document.createElement('div');
+                    newElement.textContent = item;
+                    newElement.className = 'item printed';
+                    newElement.id = item;
+                    outputDiv.appendChild(newElement);
+                });
+                document.getElementById('emptyMessage').style.display = 'none';
+            }
+        }
+
+        // Initialize the empty message visibility on load
+        updateEmptyMessage();
+    </script>
+
+</body>
+</html>
